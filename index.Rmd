@@ -13,7 +13,9 @@ output:
       after_body: 'includes/javascript.html'
 ---
 
-Rcode
+## Code
+
+### Rcode
 
 ```{r}
 library(swepophist)
@@ -42,13 +44,13 @@ age_spec <- mfrt %>%
 
 plyr::d_ply(age_spec, "county_code", function(a){
   res <- plyr::dlply(a, "to", function(b){
-    list(data = b[ ,c("x", "y")])
+    list(data = b[ ,c("y")])
   })
   writeLines(toJSON(res), sprintf("output/data/age_mfrt_%d.json", a$county_code[1]))
 })
 ```
 
-JavaScript
+### JavaScript
 
 <pre class="javascript"><code>
 ```{r js, echo = FALSE, results = "asis"}
