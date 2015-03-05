@@ -1,0 +1,60 @@
+---
+meta-title: Swedish historical marital fertility rates
+meta-author: Johan Junkka
+output: 
+  html_document:
+    template: includes/template.html
+    theme: null
+    highlight: null
+    css: css/style.css
+    self_contained: false
+    includes:
+      before_body: 'includes/body.html'
+      after_body: 'includes/javascript.html'
+---
+
+Rcode
+
+```{r}
+library(swepophist)
+library(tidyr)
+library(dplyr)
+library(jsonlite)
+
+d <- filter(mfrt, age == "total") %>% 
+  select(to, fert, context, county_code) %>% 
+  filter(to > 1880, to < 1963, context != "Hutterite") 
+
+res <- plyr::dlply(d, "context", function(a){
+  list(data = data.matrix(a[ ,c("to", "fert")]), county = a$county_code[1])
+})
+
+writeLines(toJSON(res), "output/data/mfrt.json")
+
+d_wide <- d %>% filter(!is.na(county_code)) %>% spread(to, fert)
+
+writeLines(toJSON(d_wide), "output/data/mfrt_table.json")
+
+age_spec <- mfrt %>% 
+  filter(age != "total", !age %in% c("15-19", "45-59"), to > 1880, to < 1963, context != "Hutterite") %>% 
+  mutate(age = as.integer(stringr::str_extract(age, "^[0-9]{2}"))) %>% 
+  rename(x = age, y = fert)
+
+plyr::d_ply(age_spec, "county_code", function(a){
+  res <- plyr::dlply(a, "to", function(b){
+    list(data = b[ ,c("x", "y")])
+  })
+  writeLines(toJSON(res), sprintf("output/data/age_mfrt_%d.json", a$county_code[1]))
+})
+```
+
+JavaScript
+
+<pre class="javascript"><code>
+```{r js, echo = FALSE, results = "asis"}
+x <- readLines("js/script.js")
+cat(paste(x, "
+  "))
+```
+</code>
+</pre>
