@@ -30,6 +30,12 @@ parishApp.controller('MainCtrl', function($scope, $http) {
       $scope.tbl = data;
     });
 
+  $http({method: 'GET', url: 'data/map.geo.json'}).
+    success(function(data){
+      console.log(data);
+      plot_map(data);
+    });
+
   $http({method: 'GET', url: 'data/age_mfrt_' + $scope.selected_code.county + '.json'}).
     success(function(data){
       var d2 =  fig_data(data);
@@ -47,78 +53,27 @@ parishApp.controller('MainCtrl', function($scope, $http) {
       });
   });
 
-  var plot_age_chart = function(d){
-    console.log(d);
-    age_map = new Highcharts.Chart({
-      chart: {
-          renderTo: 'mfrtage',
-          type: 'line',
-          zoomType: 'y',
-          borderWidth : 1,
-          borderColor: '#D7D7D7'
-        },      
-        title: {
-            text: ''
-        },
-        yAxis: {
-          title: {text: "MFRT"}
-        },
-        legend: {
-          enabled: false
-        },
-        series : d
-    });
+
+  var set_series_color = function(k){
+    map.series[k].update({color: '#FF5463'});
+    for (var i=0,  tot=map.series.length; i < tot; i++) {
+      // var j = i -1
+      if (i !== k){
+        map.series[i].update({color: "#AFAFAF"});
+      }
+    } 
   }
 
-  var plot_chart = function(d){
-     map = new Highcharts.Chart({
-        chart: {
-          renderTo: 'mfrtfigure',
-          type: 'line',
-          zoomType: 'xy',
-          borderWidth : 1,
-          borderColor: '#D7D7D7'
-        },      
-        title: {
-            text: ''
-        },
-        yAxis: {
-          title: {text: "TMFRT"}
-        },
-        legend: {
-          enabled: false
-        },
-        plotOptions: {
-          series:{
-            events: {
-              click: function (event) {
-                update_table(this.userOptions.county);
-              }
-            }
-          },
-          line: {
-            lineWidth: 1,
-            states: {
-              hover: {
-                lineWidth: 4,
-                color: '#000000'
-              }
-            },
-            marker: {
-              enabled: false
-            }
-          }
-        },
-        series : d
-      });
-  }
-
-  var update_table = function(code){
-    update_color(code);
+  var update_table = function(county){
+    // console.log(county);
+    set_series_color(county.index);
+    update_color(county.userOptions.county);
+    // color series
     $scope.$apply();
   }
 
   var update_color = function(code){
+    console.log("update_color", code);
     $scope.selected_code = $.grep(colors, function(e){ return e.county == code; })[0];
   }
 
@@ -135,34 +90,147 @@ parishApp.controller('MainCtrl', function($scope, $http) {
       color: "#000000"
     });
   };
+
+  var plot_map = function(d){
+    console.log('plot map');
+    cnty_map = new Highcharts.Map({
+      chart: {
+        renderTo: 'cnty_map'
+      },
+      title: {
+        text: ''
+      },
+      legend: {
+        enabled: false
+      },
+      plotOptions: {
+        map: {
+          mapData: d,
+          color: 'white',
+          joinBy: ['lan', 'county'],
+          states: {
+            hover: {
+              color: '#DED835',
+              enabled: true
+            }
+          },
+          events: {
+            click: function (event) {
+              update_color(event.point.lan);
+              // console.log(event.point.lan);
+              // update_table(this);
+              // color series
+              $scope.$apply();
+            }
+          }
+        }
+      },
+      series: [{
+        data : colors,
+        name: 'County'
+      }]
+    });
+  };
+
+  var plot_age_chart = function(d){
+    console.log(d);
+    age_map = new Highcharts.Chart({
+      chart: {
+          renderTo: 'mfrtage',
+          type: 'line',
+          zoomType: 'y',
+          borderWidth : 1,
+          borderColor: '#D7D7D7'
+        },      
+        title: {
+            text: ''
+        },
+        xAxis: {
+          categories: ['20-24', '25-29', '30-34', '35-39', '40-44']
+        },
+        yAxis: {
+          title: {text: "MFRT"},
+          min: 0,
+          max: 500
+        },
+        legend: {
+          enabled: false
+        },
+        series : d
+    });
+  }
+
+  var plot_chart = function(d){
+     map = new Highcharts.Chart({
+        chart: {
+          renderTo: 'mfrtfigure',
+          type: 'line',
+          zoomType: 'xy'
+        },      
+        title: {
+            text: ''
+        },
+        yAxis: {
+          title: {text: "TMFRT"}
+        },
+        legend: {
+          enabled: false
+        },
+        plotOptions: {
+          series:{
+            lineWidth: 1,
+            states: {
+              hover: {
+                lineWidth: 4,
+                color: '#000000'
+              }
+            },
+            events: {
+              click: function (event) {
+                // console.log(this);
+                update_table(this);
+              }
+            }
+          },
+          line: {
+            
+            marker: {
+              enabled: false
+            }
+          }
+        },
+        series : d
+      });
+  }
+
 });
 var colors = [
-    {county: 1, color: "#AFAFAF", cname: "Stockholm"},
-    {county: 2, color: "#6B9AC5", cname: "Stockholm stad"},
-    {county: 3, color: "#AFAFAF", cname: "Uppsala"},
-    {county: 4, color: "#AFAFAF", cname: "Söremanland"},
-    {county: 5, color: "#AFAFAF", cname: "Östergötland"},
-    {county: 6, color: "#AFAFAF", cname: "Jönköping"},
-    {county: 7, color: "#AFAFAF", cname: "Kronoberg"},
-    {county: 8, color: "#AFAFAF", cname: "Kalmar"},
-    {county: 9, color: "#6B9AC5", cname: "Gotland"},
-    {county: 10, color: "#AFAFAF", cname: "Blekinge"},
-    {county: 11, color: "#AFAFAF", cname: "Kristianstads"},
-    {county: 12, color: "#AFAFAF", cname: "Skåne"},
-    {county: 13, color: "#AFAFAF", cname: "Hallands"},
-    {county: 14, color: "#AFAFAF", cname: "Västra Götalands"},
-    {county: 15, color: "#AFAFAF", cname: "Älvsborgs"},
-    {county: 16, color: "#AFAFAF", cname: "Skaraborgs"},
-    {county: 17, color: "#AFAFAF", cname: "Värmlands"},
-    {county: 18, color: "#AFAFAF", cname: "Örebro"},
-    {county: 19, color: "#AFAFAF", cname: "Västmanlands"},
-    {county: 20, color: "#AFAFAF", cname: "Dalarnas"},
-    {county: 21, color: "#AFAFAF", cname: "Gävleborgs"},
-    {county: 22, color: "#AFAFAF", cname: "Västernorrlands"},
-    {county: 23, color: "#AFAFAF", cname: "Jämtlands"},
-    {county: 24, color: "#C64141", cname: "Västerbottens"},
-    {county: 25, color: "#C64141", cname: "Norrbottens"},
-    {county: "NA", color: "#000000", cname: "Sweden"}
+    {county: 1, cname: "Stockholm"},
+    {county: 2, cname: "Stockholm stad"},
+    {county: 3, cname: "Uppsala"},
+    {county: 4, cname: "Söremanland"},
+    {county: 5, cname: "Östergötland"},
+    {county: 6, cname: "Jönköping"},
+    {county: 7, cname: "Kronoberg"},
+    {county: 8, cname: "Kalmar"},
+    {county: 9, cname: "Gotland"},
+    {county: 10, cname: "Blekinge"},
+    {county: 11, cname: "Kristianstads"},
+    {county: 12, cname: "Skåne"},
+    {county: 13, cname: "Hallands"},
+    {county: 14, cname: "Västra Götalands"},
+    {county: 15, cname: "Älvsborgs"},
+    {county: 16, cname: "Skaraborgs"},
+    {county: 17, cname: "Värmlands"},
+    {county: 18, cname: "Örebro"},
+    {county: 19, cname: "Västmanlands"},
+    {county: 20, cname: "Dalarnas"},
+    {county: 21, cname: "Gävleborgs"},
+    {county: 22, cname: "Västernorrlands"},
+    {county: 23, cname: "Jämtlands"},
+    {county: 24, cname: "Västerbottens"},
+    {county: 25, cname: "Norrbottens"},
+    {county: "NA", cname: "Sweden"}
   ];
 
 var plot_data = function(d){
@@ -173,7 +241,7 @@ var plot_data = function(d){
   }
   var ret = [];
   angular.forEach(d, function(value, key) {
-    this.push({name: key, data: value.data, color: set_color(value.county[0]), county: value.county[0] });
+    this.push({name: key, data: value.data, color: '#AFAFAF', county: value.county[0] });
   }, ret);
 
   return(ret);

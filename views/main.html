@@ -6,11 +6,23 @@
       </h1>
        
     </div>
-      <div id="mfrtfigure" class="mfrt-figure col-md-12"></div>
-
+    <div class="col-md-12">
+      <h3>Marital fertility rates by county</h3>
+      <div class="row">
+        <div class="col-md-3">
+          <div id = "cnty_map"></div>
+        </div>
+        <div class="col-md-9">
+          <div id="mfrtfigure" class="mfrt-figure"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
       <select class="form-control" ng-model="selected_code" ng-options="co.cname for co in counties">
         <option value="">-- Län --</option>
       </select>
-      <div id="mfrtage" class="mfrt-figure col-md-12"></div>
+      <h3>Age specific marital fertility rates in <strong>{{selected_code.cname}}</strong></h3>
+      <div id="mfrtage" class="mfrt-figure"></div>
+    </div>
   </div>
 </div>
