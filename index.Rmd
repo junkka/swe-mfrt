@@ -15,7 +15,7 @@ output:
 
 ## Code
 
-### Rcode
+### R
 
 ```{r}
 library(swepophist)
