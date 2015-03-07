@@ -6,6 +6,6 @@ render_page <- function(clean = FALSE) {
   file.copy('views', 'output', recursive = TRUE)
   file.copy('js', 'output', recursive = TRUE)
   file.copy('css', 'output', recursive = TRUE)
-  source("scripts/make_map.R")
+  source('scripts/make_map.R')
   render('index.Rmd', output_dir='output')
 }
