@@ -35,6 +35,16 @@
   <div ng-view></div>
 </div>
 
+<div class="container footer">
+  <div class="row">
+    <div class="col-md-12">
+      <p>
+        by <a href="http://johanjunkka.com">Johan Junkka</a>. Code on <a href="https://github.com/junkka/swe-mfrt">GitHub</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
 
 <div class="container">
   
@@ -91,6 +101,7 @@ var parishApp = angular.module('mfrtApp', [
    parishApp.controller('MainCtrl', function($scope, $http) { 
      var map; 
      var age_map; 
+     var cnty_map; 
      $scope.selected_code = colors[0]; 
      $scope.counties = colors; 
     
@@ -133,11 +144,11 @@ var parishApp = angular.module('mfrtApp', [
     
     
      var set_series_color = function(k){ 
-       map.series[k].update({color: '#FF5463'}); 
+       map.series[k].update({color: '#FF5463',lineWidth: 4}); 
        for (var i=0,  tot=map.series.length; i < tot; i++) { 
          // var j = i -1 
          if (i !== k){ 
-           map.series[i].update({color: "#AFAFAF"}); 
+           map.series[i].update({color: "#AFAFAF",lineWidth: 1}); 
          } 
        }  
      } 
@@ -145,29 +156,29 @@ var parishApp = angular.module('mfrtApp', [
      var update_table = function(county){ 
        // console.log(county); 
        set_series_color(county.index); 
-       update_color(county.userOptions.county); 
+       set_county(county.userOptions.county); 
        // color series 
        $scope.$apply(); 
      } 
     
-     var update_color = function(code){ 
-       console.log("update_color", code); 
+     var set_county = function(code){ 
+       console.log("set_county", code); 
        $scope.selected_code = $.grep(colors, function(e){ return e.county == code; })[0]; 
      } 
     
-     $scope.select_county = function(code){ 
-       update_color(code); 
+     // $scope.select_county = function(code){ 
+     //   set_county(code); 
     
-       indexes = $.map(map.series, function(obj, index) { 
-         if(obj.userOptions.county == code) { 
-           return index; 
-         } 
-       }); 
+     //   indexes = $.map(map.series, function(obj, index) { 
+     //     if(obj.userOptions.county == code) { 
+     //       return index; 
+     //     } 
+     //   }); 
     
-       map.series[indexes].update({ 
-         color: "#000000" 
-       }); 
-     }; 
+     //   map.series[indexes].update({ 
+     //     color: "#000000" 
+     //   }); 
+     // }; 
     
      var plot_map = function(d){ 
        console.log('plot map'); 
@@ -194,10 +205,14 @@ var parishApp = angular.module('mfrtApp', [
              }, 
              events: { 
                click: function (event) { 
-                 update_color(event.point.lan); 
-                 // console.log(event.point.lan); 
-                 // update_table(this); 
-                 // color series 
+                 indexes = $.map(map.series, function(obj, index) { 
+                   if(obj.userOptions.county == event.point.lan) { 
+                     return index; 
+                   } 
+                 }); 
+          
+                 set_series_color(indexes[0]); 
+                 set_county(event.point.lan); 
                  $scope.$apply(); 
                } 
              } 
@@ -341,15 +356,6 @@ var parishApp = angular.module('mfrtApp', [
 
 
 
-<div class="container footer">
-  <div class="row">
-    <div class="col-md-12">
-      <p>
-        by <a href="http://johanjunkka.com">Johan Junkka</a>. Code on <a href="https://github.com/junkka/swe-mfrt">GitHub</a>.
-      </p>
-    </div>
-  </div>
-</div>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-route.min.js"></script>

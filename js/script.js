@@ -13,6 +13,7 @@ parishApp.config(function ($routeProvider) {
 parishApp.controller('MainCtrl', function($scope, $http) {
   var map;
   var age_map;
+  var cnty_map;
   $scope.selected_code = colors[0];
   $scope.counties = colors;
 
@@ -55,11 +56,11 @@ parishApp.controller('MainCtrl', function($scope, $http) {
 
 
   var set_series_color = function(k){
-    map.series[k].update({color: '#FF5463'});
+    map.series[k].update({color: '#FF5463',lineWidth: 4});
     for (var i=0,  tot=map.series.length; i < tot; i++) {
       // var j = i -1
       if (i !== k){
-        map.series[i].update({color: "#AFAFAF"});
+        map.series[i].update({color: "#AFAFAF",lineWidth: 1});
       }
     } 
   }
@@ -67,29 +68,29 @@ parishApp.controller('MainCtrl', function($scope, $http) {
   var update_table = function(county){
     // console.log(county);
     set_series_color(county.index);
-    update_color(county.userOptions.county);
+    set_county(county.userOptions.county);
     // color series
     $scope.$apply();
   }
 
-  var update_color = function(code){
-    console.log("update_color", code);
+  var set_county = function(code){
+    console.log("set_county", code);
     $scope.selected_code = $.grep(colors, function(e){ return e.county == code; })[0];
   }
 
-  $scope.select_county = function(code){
-    update_color(code);
+  // $scope.select_county = function(code){
+  //   set_county(code);
 
-    indexes = $.map(map.series, function(obj, index) {
-      if(obj.userOptions.county == code) {
-        return index;
-      }
-    });
+  //   indexes = $.map(map.series, function(obj, index) {
+  //     if(obj.userOptions.county == code) {
+  //       return index;
+  //     }
+  //   });
 
-    map.series[indexes].update({
-      color: "#000000"
-    });
-  };
+  //   map.series[indexes].update({
+  //     color: "#000000"
+  //   });
+  // };
 
   var plot_map = function(d){
     console.log('plot map');
@@ -116,10 +117,14 @@ parishApp.controller('MainCtrl', function($scope, $http) {
           },
           events: {
             click: function (event) {
-              update_color(event.point.lan);
-              // console.log(event.point.lan);
-              // update_table(this);
-              // color series
+              indexes = $.map(map.series, function(obj, index) {
+                if(obj.userOptions.county == event.point.lan) {
+                  return index;
+                }
+              });
+      
+              set_series_color(indexes[0]);
+              set_county(event.point.lan);
               $scope.$apply();
             }
           }
