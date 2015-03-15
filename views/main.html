@@ -2,21 +2,21 @@
   <div class="row">
     <div class="col-md-12">
       <h1>
-        Swedish marital fertility rates 1881-1962
+        Swedish marital fertility rates 1881-1962 <br><small>a interactive visualization of fertility decline</small>
       </h1>
-       
+       <p>The Swedish fertility decline started around the turn of the century. Although there were large variations in the timing and pace of the decline between different parts of Sweden the overall pattern is concise. This is a attempt to show both the general trend of the decline and the geographical variations through a interactive visualization.</p>
     </div>
     <div class="col-md-12">
       <h3>Marital fertility rates by county</h3>
-      <div class="row">
-        <div class="col-md-3">
-          <div id = "cnty_map"></div>
-        </div>
-        <div class="col-md-9">
-          <div id="mfrtfigure" class="mfrt-figure"></div>
-        </div>
-      </div>
     </div>
+    
+    <div class="col-md-3">
+      <div id = "cnty_map"></div>
+    </div>
+    <div class="col-md-9">
+      <div id="mfrtfigure" class="mfrt-figure"></div>
+    </div>
+  
     <div class="col-md-12">
       <select class="form-control" ng-model="selected_code" ng-options="co.cname for co in counties">
         <option value="">-- Län --</option>
