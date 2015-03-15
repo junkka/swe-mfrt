@@ -58,7 +58,6 @@ parishApp.controller('MainCtrl', function($scope, $http) {
   var set_series_color = function(k){
     map.series[k].update({color: '#FF5463',lineWidth: 4});
     for (var i=0,  tot=map.series.length; i < tot; i++) {
-      // var j = i -1
       if (i !== k){
         map.series[i].update({color: "#AFAFAF",lineWidth: 1});
       }
@@ -77,20 +76,6 @@ parishApp.controller('MainCtrl', function($scope, $http) {
     console.log("set_county", code);
     $scope.selected_code = $.grep(colors, function(e){ return e.county == code; })[0];
   }
-
-  // $scope.select_county = function(code){
-  //   set_county(code);
-
-  //   indexes = $.map(map.series, function(obj, index) {
-  //     if(obj.userOptions.county == code) {
-  //       return index;
-  //     }
-  //   });
-
-  //   map.series[indexes].update({
-  //     color: "#000000"
-  //   });
-  // };
 
   var plot_map = function(d){
     console.log('plot map');
